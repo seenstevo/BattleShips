@@ -33,3 +33,25 @@ def random_positions_boat(size):
         return [(x, y) for x, y in zip(x_positions, y_positions)]
     
 
+def turn(current_player, opponent, shot):
+    """
+    Takes the coordinates of a shot and updates opponent board and lives. Allows further shots while current shot is successful.
+    Uses Board.fire() method
+    
+    Args
+        current_player (class Board instance): the Board.fire() method called for player taking current turn
+        opponent (class Baord instance): latest version of opponents board
+        shot (tuple): x and y coordinates of the shot
+        
+    Returns
+        None
+    """
+    #while True:
+    opponent.board, hit, opponent.lives = current_player.fire(shot[0], shot[1], opponent.board, opponent.lives)
+    return hit
+        # if hit == False:
+        #     break
+        #if current_player.id != "Computer":
+        #    print(f"Here is your shot history to plan your next move: {current_player.shots_board}")
+        # if opponent.lives == 0:
+        #     break
