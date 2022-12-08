@@ -7,3 +7,8 @@ board_dimensions = (10, 10)
 
 
 lives = sum(boats.values())
+
+water_sym = " "
+boat_sym = "O"
+hit_water_sym = "*"
+hit_boat_sym = "X"

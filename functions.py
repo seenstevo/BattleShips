@@ -1,5 +1,6 @@
 import numpy as np
 import random
+
 from variables import *
 
    
@@ -29,26 +30,6 @@ def random_positions_boat(size):
         if np.min(all_positions) < 0 or np.max(all_positions) > (board_dimensions[0] - 1):
             continue
         # add coordinates of 
-        boat_positions = [(x, y) for x, y in zip(x_positions, y_positions)]
-        break
-        
-    return boat_positions
-
-def check_boat(boat_positions, board):
-    """
-    Function to check whether boat can be added to board without breaking placing rules
-
-    """
-    # check no overlap with boat
-    print(board[boat_positions])
-
-boat_positions = random_positions_boat(1)
-board = np.full((10, 10), "~")
-print(boat_positions)
-print(board)
-print(board[boat_positions])
-#check_boat(boat_positions, board)
-###### get the value from board at positions of boat
-
-
+        return [(x, y) for x, y in zip(x_positions, y_positions)]
+    
 
