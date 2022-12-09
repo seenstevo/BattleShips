@@ -1,9 +1,9 @@
 from time import sleep
 import random
 
-from functions import turn, welcome_setup
+from functions import turn, welcome_setup, final_instructions
 from Class_Boat import *
-#from variables import *
+from variables import *
 
 def main():
     
@@ -16,10 +16,10 @@ def main():
     player.place_boats() 
     computer.place_boats()
     print("\nBoats placed\n")
-    print(f"{player.id}, here are your boats:\n\n{player.board}")
-    print("\nInstructions:\nTo fire, enter coordinates for x and y axis with values 1 to 10\nIf you are successful, you can fire again.\nYou have a total of 20 lives between your 10 boats.\n")
-    print("To exit game, when asked to insert coordinates, enter 'EXIT'\n")
-    print("Let battle commence!!!!\n")
+    
+    if human_game == "yes":
+        final_instructions(board_dimensions, lives, boats, player)
+    
     
 #### Game is ready to commence! Initialise Round 1 ###################
 
@@ -27,12 +27,13 @@ def main():
     # here we create the list of coordinates for the computer to randomly select from without replacement
     all_positions_computer = [(x, y) for x in range(10) for y in range(10)]
     # for demo only
-    if human_game == "No":
+    if human_game == "no":
         all_positions_player = [(x, y) for x in range(10) for y in range(10)]
 
     while True:
         
         print("#"*20 + f" Round {round} " + "#"*20 + "\n")
+        exit_game = False
 
  ####### Player Turn #################################################    
 
@@ -40,9 +41,13 @@ def main():
             print("Before you shoot, here is your shots history:\n")
             print(player.shots_board)       
             # Take player shot coordinates
-            if human_game == "Yes":
-                x, y = ((int(c) - 1) for c in input("\nEnter coordinates:\n").split())
-            elif human_game == "No":
+            if human_game == "yes":
+                user_input = input("\nEnter coordinates:\n")
+                if user_input == "exit":
+                    exit_game = True
+                    break
+                x, y = (int(c) - 1 for c in user_input.split(","))
+            elif human_game == "no":
                 random_coor = random.choice(all_positions_player)
                 i = all_positions_player.index(random_coor)
                 x, y = all_positions_player.pop(i)
@@ -51,7 +56,12 @@ def main():
             hit = turn(player, computer, (x, y))
             if hit == False:
                 break
+        
+        if exit_game == True:
+            print("\nLeaving game\n")
+            break
             
+        # add reporting function to run after both turns
         hits = np.count_nonzero(player.shots_board == hit_boat_sym)
         misses = np.count_nonzero(player.shots_board == hit_water_sym)
         success_rate = hits / (hits + misses) * 100
@@ -67,7 +77,7 @@ def main():
       
         while True:
             print("Computer taking aim!")
-            if human_game == "Yes":
+            if human_game == "yes":
                 sleep(2)
             # Take the shot coordinates
             random_coor = random.choice(all_positions_computer)
@@ -77,6 +87,10 @@ def main():
             hit = turn(computer, player, random_shot)
             if hit == False:
                 break
+        
+        if exit_game == True:
+            print("\nLeaving game\n")
+            break
             
         hits = np.count_nonzero(computer.shots_board == hit_boat_sym)
         misses = np.count_nonzero(computer.shots_board == hit_water_sym)
@@ -99,7 +113,7 @@ def main():
 ######## Game Over ################################################## 
 
     # Game is finished so print summary of final boards   
-    print(f"Final boards looked like this, was it close?\n\nPlayer {player.id} board:\n\n {player.board} \n\nComputer board:\n\n {computer.board}")    
+    print(f"Final boards looked like this, was it close?\n\ {player.id} board:\n\n {player.board} \n\nComputer board:\n\n {computer.board}")    
     
     
 if __name__ == "__main__":

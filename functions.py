@@ -55,15 +55,30 @@ def welcome_setup():
     Computer vs computer can be used for simulation or testing.
     """
     
-    print("\n\nWelcome to battleships. \nYou will take turns attempting to fire on and sink ships placed on your opponents board.\nThe game will end once one player has lost all boats.\n")
+    print("\n\nWelcome to battleships.\n\nYou will take turns attempting to fire on and sink ships placed on your opponents board.\nThe game will end once one player has lost all boats.\n")
     
     while True:
-        human_game = input("\n'Yes' or 'No', you would like to play yourself? ('No' sets up a computer vs computer for simulation or testing.)\nYes or No?\n")
-        if human_game == "Yes":
+        human_game = input("\n'Yes' or 'No', you would like to play yourself? ('No' sets up a computer vs computer for simulation or testing.)\nYes or No?\n").lower()
+        if human_game == "yes":
             player_name = input("\nWhat is your human name player?\n")
             print(f"\nWelcome {player_name}, good luck against the machine!\n")
             break
-        elif human_game == "No":
+        elif human_game == "yo":
             player_name = "Another Computer"
             break
     return player_name, human_game
+
+def final_instructions(board_dimensions, lives, boats, player):
+    """
+    Simply print the starting board and final instructions for player.
+    
+    Args
+        board_dimensions (tuple): how big is the board being used
+        lives (int): how many lives each player has to start
+    """
+    print(f"{player.id}, here are your boats:\n\n{player.board}")
+    print("\nInstructions:\nTo fire, enter coordinates (two values 1-10 separated by a comma\n")
+    print(f"If you are successful, you can fire again.\nYou have a total of {lives} lives between your {len(boats)} boats.\n")
+    print("To exit game, when asked to insert coordinates, enter 'EXIT'\n")
+    print("Let battle commence!!!!\n")
+    
