@@ -1,18 +1,14 @@
 from time import sleep
+import random
 
-from functions import *
+from functions import turn, welcome_setup
 from Class_Boat import *
-from variables import *
+#from variables import *
 
 def main():
     
-    human_game = input("True or False, you would like to play yourself?\nSetting to False sets up a computer vs computer simulation.\n")
-    if human_game == "True":
-        player_name = input("What is your name player?\n")
-    else:
-        player_name = "Another_Computer"
+    player_name, human_game = welcome_setup()
     
-    # set up boards with Board instances for player and computer
     player = Board(player_name)
     computer = Board("Computer")
 
@@ -31,10 +27,11 @@ def main():
     # here we create the list of coordinates for the computer to randomly select from without replacement
     all_positions_computer = [(x, y) for x in range(10) for y in range(10)]
     # for demo only
-    if human_game == "False":
+    if human_game == "No":
         all_positions_player = [(x, y) for x in range(10) for y in range(10)]
 
     while True:
+        
         print("#"*20 + f" Round {round} " + "#"*20 + "\n")
 
  ####### Player Turn #################################################    
@@ -43,9 +40,9 @@ def main():
             print("Before you shoot, here is your shots history:\n")
             print(player.shots_board)       
             # Take player shot coordinates
-            if human_game == "True":
+            if human_game == "Yes":
                 x, y = ((int(c) - 1) for c in input("\nEnter coordinates:\n").split())
-            else:
+            elif human_game == "No":
                 random_coor = random.choice(all_positions_player)
                 i = all_positions_player.index(random_coor)
                 x, y = all_positions_player.pop(i)
@@ -57,7 +54,8 @@ def main():
             
         hits = np.count_nonzero(player.shots_board == hit_boat_sym)
         misses = np.count_nonzero(player.shots_board == hit_water_sym)
-        print(f"Total fired shots {hits + misses} with a success rate of {hits / (hits + misses) * 100}\nComputer has {computer.lives} lives left")
+        success_rate = hits / (hits + misses) * 100
+        print(f"Total fired shots {hits + misses} with a success rate of {success_rate:.2f}%\nComputer has {computer.lives} lives left")
         
 ######## Check Computer Still Has Lives ##############################
 
@@ -69,7 +67,7 @@ def main():
       
         while True:
             print("Computer taking aim!")
-            if human_game == "False":
+            if human_game == "Yes":
                 sleep(2)
             # Take the shot coordinates
             random_coor = random.choice(all_positions_computer)
@@ -82,7 +80,8 @@ def main():
             
         hits = np.count_nonzero(computer.shots_board == hit_boat_sym)
         misses = np.count_nonzero(computer.shots_board == hit_water_sym)
-        print(f"Total shots on your water: {hits + misses}, with a success rate of {hits / (hits + misses) * 100}.\nYou have {player.lives} lives left")
+        success_rate = hits / (hits + misses) * 100
+        print(f"Total shots on your water: {hits + misses}, with a success rate of {success_rate:.2f}%.\nYou have {player.lives} lives left")
             
 ######## Check Player Still Has Lives ################################
 
@@ -100,28 +99,7 @@ def main():
 ######## Game Over ################################################## 
 
     # Game is finished so print summary of final boards   
-    print(f"Final boards looked like this, was it close?\n\nPlayer {player.id} board:\n\n {player.board} \n\nComputer board:\n\n {computer.board}")       
-        
-        
-        
-        
-        
-        # while True:
-        #     random_coor = random.choice(all_positions_player)
-        #     i = all_positions_player.index(random_coor)
-        #     shot_location = all_positions_player.pop(i)
-        #     #shot_location = [int(c) for c in input("\nEnter coordinates, row then column. E.g 2 5:\n").split()]
-        #     # add check for values
-        #     computer.board, hit, computer.lives = player.fire(shot_location[0],shot_location[1], computer.board, computer.lives)
-        #     if hit == False:
-        #         break
-        #     print(f"Here is your shot history to plan your next move: {player.shots_board}")
-        #     if computer.lives == 0:
-        #         break      
-        
-        
-
-    
+    print(f"Final boards looked like this, was it close?\n\nPlayer {player.id} board:\n\n {player.board} \n\nComputer board:\n\n {computer.board}")    
     
     
 if __name__ == "__main__":

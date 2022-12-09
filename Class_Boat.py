@@ -1,7 +1,7 @@
 import numpy as np
 
 from variables import *
-from functions import *
+from functions import random_positions_boat
 
 
 class Board:

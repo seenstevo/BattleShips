@@ -46,12 +46,24 @@ def turn(current_player, opponent, shot):
     Returns
         None
     """
-    #while True:
     opponent.board, hit, opponent.lives = current_player.fire(shot[0], shot[1], opponent.board, opponent.lives)
     return hit
-        # if hit == False:
-        #     break
-        #if current_player.id != "Computer":
-        #    print(f"Here is your shot history to plan your next move: {current_player.shots_board}")
-        # if opponent.lives == 0:
-        #     break
+
+def welcome_setup():
+    """
+    Function to set up game type (human vs computer or computer vs computer) and take player name if required.
+    Computer vs computer can be used for simulation or testing.
+    """
+    
+    print("\n\nWelcome to battleships. \nYou will take turns attempting to fire on and sink ships placed on your opponents board.\nThe game will end once one player has lost all boats.\n")
+    
+    while True:
+        human_game = input("\n'Yes' or 'No', you would like to play yourself? ('No' sets up a computer vs computer for simulation or testing.)\nYes or No?\n")
+        if human_game == "Yes":
+            player_name = input("\nWhat is your human name player?\n")
+            print(f"\nWelcome {player_name}, good luck against the machine!\n")
+            break
+        elif human_game == "No":
+            player_name = "Another Computer"
+            break
+    return player_name, human_game
