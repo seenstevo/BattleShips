@@ -40,11 +40,16 @@ class Board:
         """
         what_hit = opponent_board[x, y]
         if what_hit == boat_sym:
-            print("\nYou've hit a ship!\nFire again!\n")
+            print("\nYou've hit a ship!")
             opponent_board[x, y] = hit_boat_sym
             self.shots_board[x,y] = hit_boat_sym
             hit = True
             opponent_lives = opponent_lives - 1
+            if opponent_lives == 0:
+                hit = False
+                print("That was the last of the enemy!")
+            else:
+                print("\nFire again!\n")
         elif what_hit == water_sym:
             print("\nSplash! That missed!\n")
             opponent_board[x, y] = hit_water_sym

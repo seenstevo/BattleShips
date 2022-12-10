@@ -1,13 +1,13 @@
 from time import sleep
 import random
 
-from functions import turn, welcome_setup, final_instructions
+from functions import turn, welcome_and_setup, final_instructions, human_turn, computer_turn, reporting
 from Class_Boat import *
 from variables import *
 
 def main():
     
-    player_name, human_game = welcome_setup()
+    player_name, human_game, all_positions_computer, all_positions_another_computer = welcome_and_setup()
     
     player = Board(player_name)
     computer = Board("Computer")
@@ -15,106 +15,91 @@ def main():
     # Now place the boats for both boards using the place_boats method
     player.place_boats() 
     computer.place_boats()
-    print("\nBoats placed\n")
     
+    sleep_time = 0
     if human_game == "yes":
-        final_instructions(board_dimensions, lives, boats, player)
+        final_instructions(lives, boats, player)
+        del all_positions_another_computer
+        sleep_time = 2
     
     
 #### Game is ready to commence! Initialise Round 1 ###################
 
     round = 1
-    # here we create the list of coordinates for the computer to randomly select from without replacement
-    all_positions_computer = [(x, y) for x in range(10) for y in range(10)]
-    # for demo only
-    if human_game == "no":
-        all_positions_player = [(x, y) for x in range(10) for y in range(10)]
 
     while True:
         
         print("#"*20 + f" Round {round} " + "#"*20 + "\n")
         exit_game = False
+        print("Your board and your boats look like this:\n")
+        print(player.board)
+        print(f"\nLives remaining: {player.id} has {player.lives}, and {computer.id} has {computer.lives}")
+        sleep(sleep_time)
+        if human_game == "yes":
+            input("\nHit 'Enter' to continue with your turn")
 
- ####### Player Turn #################################################    
-
+ ####### Player Turn #################################################
         while True:
-            print("Before you shoot, here is your shots history:\n")
-            print(player.shots_board)       
-            # Take player shot coordinates
             if human_game == "yes":
-                user_input = input("\nEnter coordinates:\n")
-                if user_input == "exit":
-                    exit_game = True
-                    break
-                x, y = (int(c) - 1 for c in user_input.split(","))
+                print("\nBefore you shoot, here is your shots history:")
+                try:
+                    print(f"Reminder: Your last shot was at {x+1}-{y+1}\n")
+                except:
+                    pass
+                print(f"\n{player.shots_board}")
+                user_input = input("\nEnter coordinates:\n").lower()
+                exit_game, x, y = human_turn(user_input, player)
+                
+            if exit_game == True:
+                break
+                          
             elif human_game == "no":
-                random_coor = random.choice(all_positions_player)
-                i = all_positions_player.index(random_coor)
-                x, y = all_positions_player.pop(i)
-            
-            # take the turn
+                x, y = computer_turn(all_positions_another_computer)
+                
             hit = turn(player, computer, (x, y))
+            
             if hit == False:
                 break
-        
+            
         if exit_game == True:
             print("\nLeaving game\n")
             break
-            
-        # add reporting function to run after both turns
-        hits = np.count_nonzero(player.shots_board == hit_boat_sym)
-        misses = np.count_nonzero(player.shots_board == hit_water_sym)
-        success_rate = hits / (hits + misses) * 100
-        print(f"Total fired shots {hits + misses} with a success rate of {success_rate:.2f}%\nComputer has {computer.lives} lives left")
         
-######## Check Computer Still Has Lives ##############################
+        if human_game == "yes":
+            input("\nHit 'Enter' to continue with opponents turn")
+            reporting(player, computer)
 
         if computer.lives == 0:
-            print(f"Congratulations player {player.id}, you have beaten the computer!")
+            print(f"\nCongratulations {player.id}, you have beaten the computer with {player.lives} lives remaining!\n")
             break
         
  ####### Computer Turn ###############################################  
       
         while True:
-            print("Computer taking aim!")
+
             if human_game == "yes":
-                sleep(2)
-            # Take the shot coordinates
-            random_coor = random.choice(all_positions_computer)
-            i = all_positions_computer.index(random_coor)
-            random_shot = all_positions_computer.pop(i)
-            # Take turn of computer
-            hit = turn(computer, player, random_shot)
+                print("Computer taking aim!")
+                sleep(sleep_time)
+
+            xx, yy = computer_turn(all_positions_computer)
+
+            hit = turn(computer, player, (xx, yy))
+            
             if hit == False:
                 break
-        
-        if exit_game == True:
-            print("\nLeaving game\n")
-            break
             
-        hits = np.count_nonzero(computer.shots_board == hit_boat_sym)
-        misses = np.count_nonzero(computer.shots_board == hit_water_sym)
-        success_rate = hits / (hits + misses) * 100
-        print(f"Total shots on your water: {hits + misses}, with a success rate of {success_rate:.2f}%.\nYou have {player.lives} lives left")
-            
-######## Check Player Still Has Lives ################################
+        reporting(computer, player)
 
         if player.lives == 0:
-            print(f"Unlucky player {player.id}, you have been beaten the computer!")
+            print(f"Unlucky {player.id}, you have been beaten the computer who had {computer.lives} lives remaining!")
             break
-        
-        print("After the computer turn, your board looks like this now:\n")
-        print(player.board)
-        
-######## Next Round ##################################################  
       
         round += 1
-        
-######## Game Over ################################################## 
 
-    # Game is finished so print summary of final boards   
-    print(f"Final boards looked like this, was it close?\n\ {player.id} board:\n\n {player.board} \n\nComputer board:\n\n {computer.board}")    
-    
+    # Game is finished so print summary of final boards
+    if exit_game == False: 
+        print(f"\nFinal boards looked like this:\n\n {player.id}'s board:\n\n {player.board} \n\nComputer board:\n\n {computer.board}\n")
+        
     
 if __name__ == "__main__":
     main()
