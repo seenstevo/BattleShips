@@ -1,9 +1,10 @@
 import numpy as np
 import random
+import re
 
 from variables import *
 
-   
+
 def random_positions_boat(size):
     """
     Generate a randomly positioned boat of given size and check it doesn't overflow board
@@ -31,24 +32,7 @@ def random_positions_boat(size):
             continue
         # add coordinates of 
         return [(x, y) for x, y in zip(x_positions, y_positions)]
-    
-
-def turn(current_player, opponent, shot):
-    """
-    Takes the coordinates of a shot and updates opponent board and lives. Allows further shots while current shot is successful.
-    Uses Board.fire() method
-    
-    Args
-        current_player (class Board instance): the Board.fire() method called for player taking current turn
-        opponent (class Baord instance): latest version of opponents board
-        shot (tuple): x and y coordinates of the shot
-        
-    Returns
-        None
-    """
-    opponent.board, hit, opponent.lives = current_player.fire(shot[0], shot[1], opponent.board, opponent.lives)
-    return hit
-
+   
 def welcome_and_setup():
     """
     Function to set up game type (human vs computer or computer vs computer) and take player name if required.
@@ -83,36 +67,69 @@ def final_instructions(lives, boats, player):
         player (class Board instance): this gets the player instance from which we get the id and board with boats placed
     """
     print(f"{player.id}, here are your boats:\n\n{player.board}")
-    print("\nInstructions:\nTo fire, enter coordinates (two values 1-10 separated by a comma or space. E.g. 2,6 or 2 6)\n")
-    print(f"If you are successful, you can fire again.\nYou have a total of {lives} lives between your {len(boats)} boats.\n")
-    print("To exit game, when asked to insert coordinates, enter 'EXIT'\n")
+    print("\nInstructions:\n\n\t- To fire, enter coordinates (two values 1-10 separated by a comma or space. E.g. 2,6 or 2 6)")
+    print(f"\t- If you are successful, you can fire again.")
+    print(f"\t- You have a total of {lives} lives between your {len(boats)} boats.")
+    print("\t- To exit game, when asked to insert coordinates, enter 'EXIT'\n")
     print("Let battle commence!!!!\n")
     
     
-def human_turn(user_input, player):
+def human_turn(user_input):
     """
+    For human player turn, checks user input for legal coordinates
     
+    Args:
+        user_input (str): user typed input
+        
+    Returns:
+        exit_game (bool): should game be exited?
+        x (int): coordinate in x-axis (rows). or "x" string if game to be exited
+        y (int): coordinate in y-axis (columns). or "y" string if game to be exited
+        
+    Raises:
+        ValueError if no valid coordinates have been entered
     """
     exit_game = False
-    x, y = 0, 0    
+    x, y = "x", "y"    
     if user_input == "exit":
         exit_game = True
         return exit_game, x, y
     try:
-        x, y = (int(c) - 1 for c in user_input.split(","))
-        return exit_game, x, y
-    except ValueError:
-        try:
-            x, y = (int(c) - 1 for c in user_input.split())
+        x, y = ((int(c) -1) for c in re.split('[ ,.-]', user_input))
+        if check_coordinate_limits(x, y):
             return exit_game, x, y
-        except ValueError:
-            print("\nWARNING Gunners do not understand those coordinates, please try again\n")
-            
-            
+    except ValueError:
+        print("\nWARNING Gunners do not understand those coordinates, please try again\n")
+    # try:
+    #     x, y = (int(c) - 1 for c in user_input.split(","))
+    #     fine = check_coordinate_limits(x, y)
+    #     if fine:
+    #         return exit_game, x, y
+    # except ValueError:
+    #     pass
+    # try:
+    #     x, y = (int(c) - 1 for c in user_input.split())
+    #     fine = check_coordinate_limits(x, y)
+    #     if fine:
+    #         return exit_game, x, y
+    # except ValueError:
+    #     print("\nWARNING Gunners do not understand those coordinates, please try again\n")
+        
+             
+def check_coordinate_limits(x, y):
+    """
+    Helper function to check input coordinates are on board
+    """
+    if (x < 1) or (x > board_dimensions[0]) or (y < 1) or (y > board_dimensions[1]):
+        print(f"Please enter values between 1-{board_dimensions[0]} and 1-{board_dimensions[1]}")
+        return False
+    else:
+        return True
+    
             
 def computer_turn(all_positions_player):
     """
-    
+    Selects a random coordinate for firing
     """
     random_coor = random.choice(all_positions_player)
     i = all_positions_player.index(random_coor)
@@ -120,12 +137,31 @@ def computer_turn(all_positions_player):
     return xx, yy
 
 
-def reporting(player_turn, opponent):
+def reporting(human_game, player_one, player_two):
+    """
+    simple report of shots fired and success rate
+    """
+    if human_game == "yes":
+        try:
+            hits = np.count_nonzero(player_one.shots_board == hit_boat_sym)
+            misses = np.count_nonzero(player_one.shots_board == hit_water_sym)
+            success_rate = hits / (hits + misses) * 100
+            print(f"Total fired shots by {player_one.id}: {hits + misses} with a success rate of {success_rate:.2f}\n")
+            hits = np.count_nonzero(player_two.shots_board == hit_boat_sym)
+            misses = np.count_nonzero(player_two.shots_board == hit_water_sym)
+            success_rate = hits / (hits + misses) * 100
+            print(f"Total fired shots by {player_two.id}: {hits + misses} with a success rate of {success_rate:.2f}\n")
+        except:
+            pass
+    
+def preround(human_game, player_one, player_two, round_no):
     """
     
     """
-    hits = np.count_nonzero(player_turn.shots_board == hit_boat_sym)
-    misses = np.count_nonzero(player_turn.shots_board == hit_water_sym)
-    success_rate = hits / (hits + misses) * 100
-    print(f"Total fired shots by {player_turn.id}: {hits + misses} with a success rate of {success_rate:.2f}\n")
-    
+    print("#"*20 + f" Round {round_no} " + "#"*20 + "\n")
+    if human_game == "yes":
+        print(f"{player_one.id} Your board and your boats look like this:\n")
+        print(player_one.board)
+        print(f"\nLives remaining: {player_one.id} has {player_one.lives}, and {player_two.id} has {player_two.lives}")
+        if human_game == "yes":
+            input("\nHit 'Enter' to continue with your turn\n")

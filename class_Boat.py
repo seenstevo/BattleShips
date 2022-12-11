@@ -1,4 +1,6 @@
 import numpy as np
+import random
+from time import sleep
 
 from variables import *
 from functions import random_positions_boat
@@ -16,6 +18,7 @@ class Board:
         self.board = np.full(self.board_dimensions, water_sym)
         self.shots_board = np.full(self.board_dimensions, water_sym)
         self.lives = lives
+        
     
     def place_boats(self):
         """
@@ -34,43 +37,32 @@ class Board:
                         self.board[position] = boat_sym
                 break
 
-    def fire(self, x, y, opponent_board, opponent_lives):
+    def fire(self, x, y, opponent):
         """
         Takes x and y positions for a shot and updates board 
         """
-        what_hit = opponent_board[x, y]
+        what_hit = opponent.board[x, y]
         if what_hit == boat_sym:
-            print("\nYou've hit a ship!")
-            opponent_board[x, y] = hit_boat_sym
+            print("\nBingo, a ship has been hit!")
+            opponent.board[x, y] = hit_boat_sym
             self.shots_board[x,y] = hit_boat_sym
             hit = True
-            opponent_lives = opponent_lives - 1
-            if opponent_lives == 0:
+            opponent.lives = opponent.lives - 1
+            if opponent.lives == 0:
                 hit = False
                 print("That was the last of the enemy!")
+                sleep(3)
             else:
                 print("\nFire again!\n")
         elif what_hit == water_sym:
             print("\nSplash! That missed!\n")
-            opponent_board[x, y] = hit_water_sym
+            opponent.board[x, y] = hit_water_sym
             self.shots_board[x,y] = hit_water_sym
             hit = False
         else:
             print("\nYou already blew this place up!\n")
             hit = False
-        return opponent_board, hit, opponent_lives
-    
-        
-        
-        
-        
-        
-    
-    
-#player_board = Board("Sean")
-#print(player_board.board)
-#print(player_board.place_boats())
-#print(player_board.board)
+        return hit
 
 
 
