@@ -7,7 +7,7 @@ from variables import *
 
 def main():
     
-    player_name, human_game, all_positions_computer, all_positions_another_computer = welcome_and_setup()
+    player_name, human_game, all_positions_computer, all_positions_another_computer, level = welcome_and_setup()
     
     player_one = Board(player_name)
     player_two = Board("Computer")
@@ -62,13 +62,13 @@ def main():
         if exit_game == True:
             print("\nLeaving game\n")
             break
-        
-        if human_game == "yes":
-            input("\nHit 'Enter' to continue with opponents turn")
 
         if player_two.lives == 0:
             print(f"\nCongratulations {player_one.id}, you have beaten the computer with {player_one.lives} lives remaining!\n")
             break
+        
+        if human_game == "yes":
+            input("\nHit 'Enter' to continue with opponents turn")
         
  ####### Computer Turn ###############################################  
       
@@ -77,11 +77,12 @@ def main():
             if human_game == "yes":
                 print("\nComputer taking aim!")
                 sleep(sleep_time)
-
-            xx, yy = computer_turn(all_positions_computer)
-
-            #hit = player_two.turn(player_one, (xx, yy))
-            hit = player_two.fire(x, y, player_one)
+            
+            if level == "hard":
+                hit = hard_turn(player_two, player_one, all_positions_computer)
+            else:
+                xx, yy = computer_turn(all_positions_computer)
+                hit = player_two.fire(xx, yy, player_one)
             
             if hit == False:
                 break

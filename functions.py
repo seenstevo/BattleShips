@@ -41,19 +41,20 @@ def welcome_and_setup():
     
     print("\n\nWelcome to battleships.\n\nYou will take turns attempting to fire on and sink ships placed on your opponents board.\nThe game will end once one player has lost all boats.\n")
     all_positions_computer = [(x, y) for x in range(board_dimensions[0]) for y in range(board_dimensions[1])]
-    
+    level = ""
     while True:
         human_game = input("\n'Yes' or 'No', you would like to play yourself? ('No' sets up a computer vs computer for simulation or testing.)\nYes or No?\n").lower()
         if human_game == "yes":
             player_name = input("\nWhat is your human name player?\n")
             print(f"\nWelcome {player_name}, good luck against the machine!\n")
             all_positions_another_computer = []
+            level = input("Would you like to play in 'hard' mode?\nThis gives computer 3x chance to hit your boats.\nEnter 'hard' or press 'enter' for normal.\n")
             break
         elif human_game == "no":
             player_name = "Another Computer"
-            all_positions_another_computer = [(x, y) for x in range(board_dimensions[0]) for y in range(board_dimensions[1])]
+            all_positions_another_computer = all_positions_computer.copy()
             break
-    return player_name, human_game, all_positions_computer, all_positions_another_computer
+    return player_name, human_game, all_positions_computer, all_positions_another_computer, level
 
 
 
@@ -100,20 +101,6 @@ def human_turn(user_input):
             return exit_game, x, y
     except ValueError:
         print("\nWARNING Gunners do not understand those coordinates, please try again\n")
-    # try:
-    #     x, y = (int(c) - 1 for c in user_input.split(","))
-    #     fine = check_coordinate_limits(x, y)
-    #     if fine:
-    #         return exit_game, x, y
-    # except ValueError:
-    #     pass
-    # try:
-    #     x, y = (int(c) - 1 for c in user_input.split())
-    #     fine = check_coordinate_limits(x, y)
-    #     if fine:
-    #         return exit_game, x, y
-    # except ValueError:
-    #     print("\nWARNING Gunners do not understand those coordinates, please try again\n")
         
              
 def check_coordinate_limits(x, y):
@@ -146,11 +133,11 @@ def reporting(human_game, player_one, player_two):
             hits = np.count_nonzero(player_one.shots_board == hit_boat_sym)
             misses = np.count_nonzero(player_one.shots_board == hit_water_sym)
             success_rate = hits / (hits + misses) * 100
-            print(f"Total fired shots by {player_one.id}: {hits + misses} with a success rate of {success_rate:.2f}\n")
+            print(f"- Total fired shots by {player_one.id}: {hits + misses} with a success rate of {success_rate:.2f}")
             hits = np.count_nonzero(player_two.shots_board == hit_boat_sym)
             misses = np.count_nonzero(player_two.shots_board == hit_water_sym)
             success_rate = hits / (hits + misses) * 100
-            print(f"Total fired shots by {player_two.id}: {hits + misses} with a success rate of {success_rate:.2f}\n")
+            print(f"- Total fired shots by {player_two.id}: {hits + misses} with a success rate of {success_rate:.2f}\n")
         except:
             pass
     
@@ -165,3 +152,17 @@ def preround(human_game, player_one, player_two, round_no):
         print(f"\nLives remaining: {player_one.id} has {player_one.lives}, and {player_two.id} has {player_two.lives}")
         if human_game == "yes":
             input("\nHit 'Enter' to continue with your turn\n")
+            
+
+def hard_turn(player_two, player_one, all_positions_computer):
+    """
+    Gives unfair advantage with three attempts to hit boat for computer on each turn
+    """
+    unfair_shots = 3
+    while unfair_shots > 0:
+        xx, yy = computer_turn(all_positions_computer)
+        hit = player_two.fire(xx, yy, player_one)
+        if hit == True:
+            unfair_shots = 0
+        unfair_shots -= 1
+    return hit

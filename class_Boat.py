@@ -63,6 +63,17 @@ class Board:
             print("\nYou already blew this place up!\n")
             hit = False
         return hit
+    
+    # def add_board_numbers(self):
+    #     x_label = np.arange(1, self.board_dimensions[0]+1).reshape(self.board_dimensions[0], 1)
+    #     y_label = np.arange(0, self.board_dimensions[0]+2).reshape(1, self.board_dimensions[0]+2)
+        
+    #     self.board = np.hstack((x_label, self.board, x_label))
+    #     self.board = np.vstack((y_label, self.board, y_label))
+        
+    #     corners = ((0,0), (0,self.board_dimensions[1]+1), (self.board_dimensions[0]+1,0), (self.board_dimensions[0]+1,self.board_dimensions[1]+1))
+    #     for corner in corners:
+    #         self.board[corner] = " "
 
 
 
