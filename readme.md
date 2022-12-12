@@ -1,4 +1,5 @@
 # Battleships game implemented in python
+## by Sean Stevenson
 
 ## About The Game
 
@@ -13,7 +14,7 @@ This game involves two players who each place a set number of boats on a board. 
 ## The file system
 
 - main.py:            principal script for running the game which controls logic flow.
-- class_Boat.py:      definition of the attributes and methods for the Board class. each game involves two instances of this class, one for each player.
+- Boat.py:            definition of the attributes and methods for the Board class. each game involves two instances of this class, one for each player.
 - functions.py:       contains helper functions outside scope of the class Board.
 - functions_print.py  contains all functions relating to prints including game set up
 - readme.md:          this readme
@@ -25,36 +26,54 @@ This game involves two players who each place a set number of boats on a board. 
 
 ### **variables.py**
 
-boats:              dictionary with all boats to be placed on board (default 10 boats: 4x1, 3x2, 2x3 and 1x4)
-board_dimension:    tuple of board size (default (10,10))
-lives:              int of total number of lives based on total boat spaces (default 20)
-water_sym:          string character to represent water (default " ")
-boat_sym:           string character to represent boat (default "O")
-hit_water_sym:      string character to represent water hit by shot (default "*")
+boats:              dictionary with all boats to be placed on board (default 10 boats: 4x1, 3x2, 2x3 and 1x4)  
+board_dimension:    tuple of board size (default (10,10))  
+lives:              int of total number of lives based on total boat spaces (default 20)  
+water_sym:          string character to represent water (default " ")  
+boat_sym:           string character to represent boat (default "O")  
+hit_water_sym:      string character to represent water hit by shot (default "*")  
 hit_boat_sym:       string character to represent hit boat position (default "X")
 
-### **class_Boat.py**
 
-class Boat:
-    class attributes:
-        boats: dictionary taken from variables
-        board_dimension: tuple taken from variables
-    class instance attributes:
-        self.id: id name for player
-        self.board: array representing players board
-        self.shots_board: array representing shots by player
-        self.lives: lives remaining for player
-    methods:
-        place_boats(): method to take possible positions for boat from random_positions_boat() method and place boats if positions possible, updating board.
-        fire(): method to take shot coordinates by player and update the opponents board
+### **Boat.py**
+
+**instance attributes**
+
+-self.id: id name for player  
+-self.board: array representing players board  
+-self.shots_board: array representing shots by player  
+-self.lives: lives remaining for player  
+**methods**
+
+-place_boats(): method to take possible positions for boat from random_positions_boat() method and place boats if positions possible, updating board.  
+-fire(): method to take shot coordinates by player and update the opponents board  
 
 
 ### **functions.py**
 
-random_positions_boat():
-:   get random boat positions for given boat
-welcome_and_setup():
-:   set up type of game and print basic game informatoin if human player
-final_instructions():
-:   show board to human player and give final instructions for firing
+**random_positions_boat()**
+-get random boat positions for given boat
 
+**welcome_and_setup()**
+-set up type of game and print basic game informatoin if human player
+
+**human_turn()**
+-controls input from human player
+
+**check_coordinate_limits()**
+-checks user input is on board
+
+**computer_select_coordinates()**
+-chose computer coordinates from list of coordinates
+
+**hard_turn()**
+-logic flow for hard mode allowing 3 shots per turn for computer
+
+
+### **functions_print.py**
+
+**final_instructions()**
+-show board to human player and give final instructions for firing
+
+**preround_reporting()**
+-print summary of game and stats after each round
