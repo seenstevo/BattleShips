@@ -2,10 +2,12 @@ from time import sleep
 import random
 
 from functions import *
-from class_Boat import *
+from class_Board import *
 from variables import *
 
 def main():
+    
+    print("\n     ,     ,     ,\n    / \\   / \\   / \\\n   /___\\ /___\\ /___\\\n   |/ \\| |/ \\| |/ \\|\n   /   \\ /   \\ /   \\\n  /     \\/     \\/     \\\n /       /       /       \\\n/_________/_________/_________\\")
     
     player_name, human_game, all_positions_computer, all_positions_another_computer, level = welcome_and_setup()
     
@@ -16,12 +18,9 @@ def main():
     player_one.place_boats() 
     player_two.place_boats()
     
-    sleep_time = 0
     if human_game == "yes":
-        final_instructions(lives, boats, player_one)
-        del all_positions_another_computer
-        sleep_time = 2
-    
+        final_instructions(lives, boats)
+        del all_positions_another_computer    
     
 #### Game is ready to commence! Initialise Round 1 ###################
 
@@ -30,17 +29,16 @@ def main():
 
     while True:
         
-        preround(human_game, player_one, player_two, round_no)
-        reporting(human_game, player_one, player_two)
+        preround_reporting(human_game, player_one, player_two, round_no)
 
- ####### Player Turn #################################################
+        # player_one turn
         while True:
+            
             if human_game == "yes":
-                print("\nBefore you shoot, here is your shots history:")
                 try:
-                    print(f"Reminder: Your last shot was at {x+1}-{y+1}\n")
+                    print(f"\nBefore you shoot, here is your shots history. (Your last shot was at {x+1}-{y+1}):\n")
                 except:
-                    pass
+                    print("\nBefore you shoot, here is your shots history:")
                 print(f"\n{player_one.shots_board}")
                 user_input = input("\nEnter coordinates:\n").lower()
                 try:
@@ -52,41 +50,40 @@ def main():
                 break
                           
             elif human_game == "no":
-                x, y = computer_turn(all_positions_another_computer)
+                x, y = computer_select_coordinates(all_positions_another_computer)
 
             hit = player_one.fire(x, y, player_two)
             
-            if hit == False:
+            if hit == False or (player_two.lives == 0):
                 break
+            
+        if player_two.lives == 0:
+            print(f"\nCongratulations {player_one.id}, you have beaten the computer with {player_one.lives} lives remaining!\n")
+            break
             
         if exit_game == True:
             print("\nLeaving game\n")
             break
-
-        if player_two.lives == 0:
-            print(f"\nCongratulations {player_one.id}, you have beaten the computer with {player_one.lives} lives remaining!\n")
-            break
         
         if human_game == "yes":
             input("\nHit 'Enter' to continue with opponents turn")
-        
- ####### Computer Turn ###############################################  
-      
+         
+        # player_two turn
         while True:
 
             if human_game == "yes":
-                print("\nComputer taking aim!")
-                sleep(sleep_time)
+                print("\nComputer taking aim!\n")
+                sleep(2)
             
             if level == "hard":
                 hit = hard_turn(player_two, player_one, all_positions_computer)
             else:
-                xx, yy = computer_turn(all_positions_computer)
+                xx, yy = computer_select_coordinates(all_positions_computer)
                 hit = player_two.fire(xx, yy, player_one)
             
-            if hit == False:
+            if hit == False or (player_one.lives == 0):
                 break
-
+            
         if player_one.lives == 0:
             print(f"Unlucky {player_one.id}, you have been beaten the computer who had {player_two.lives} lives remaining!")
             break
