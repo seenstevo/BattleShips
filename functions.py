@@ -1,6 +1,7 @@
 import numpy as np
 import random
 import re
+from time import sleep
 
 from variables import *
 
@@ -48,7 +49,11 @@ def welcome_and_setup():
             player_name = input("\nWhat is your human name player?\n")
             print(f"\nWelcome {player_name}, good luck against the machine!\n")
             all_positions_another_computer = []
-            level = input("Would you like to play in 'hard' mode?\nThis gives computer 3x chance to hit your boats.\nEnter 'hard' or press 'enter' for normal.\n")
+            level = input("Would you like to play in 'hard' mode?\nThis gives computer 3x chance to hit your boats.\nEnter 'hard' or press 'enter' for normal.\n").lower()
+            if level == "hard":
+                print("Playing in 'hard' mode.\n\n")
+            else:
+                print("Playing in 'normal' mode.\n\n")
             break
         elif human_game == "no":
             player_name = "Another Computer"
@@ -58,7 +63,7 @@ def welcome_and_setup():
 
 
 
-def final_instructions(lives, boats, player):
+def final_instructions(lives, boats):
     """
     Simply print the starting board and final instructions for player.
     
@@ -67,12 +72,13 @@ def final_instructions(lives, boats, player):
         boats (dict): all boats to be placed for each board
         player (class Board instance): this gets the player instance from which we get the id and board with boats placed
     """
-    print(f"{player.id}, here are your boats:\n\n{player.board}")
-    print("\nInstructions:\n\n\t- To fire, enter coordinates (two values 1-10 separated by a comma or space. E.g. 2,6 or 2 6)")
+    print("\nInstructions:\n\n\t- To fire, enter coordinates (two values 1-10 separated by a ',', '.', '-' or a space. E.g. 2,6 or 2 6)")
     print(f"\t- If you are successful, you can fire again.")
     print(f"\t- You have a total of {lives} lives between your {len(boats)} boats.")
     print("\t- To exit game, when asked to insert coordinates, enter 'EXIT'\n")
+    input("Press 'enter' when you are ready to begin.\n")
     print("Let battle commence!!!!\n")
+    sleep(2)
     
     
 def human_turn(user_input):
@@ -107,14 +113,14 @@ def check_coordinate_limits(x, y):
     """
     Helper function to check input coordinates are on board
     """
-    if (x < 1) or (x > board_dimensions[0]) or (y < 1) or (y > board_dimensions[1]):
+    if (x < 0) or (x > board_dimensions[0]) or (y < 0) or (y > board_dimensions[1]):
         print(f"Please enter values between 1-{board_dimensions[0]} and 1-{board_dimensions[1]}")
         return False
     else:
         return True
     
             
-def computer_turn(all_positions_player):
+def computer_select_coordinates(all_positions_player):
     """
     Selects a random coordinate for firing
     """
@@ -122,6 +128,22 @@ def computer_turn(all_positions_player):
     i = all_positions_player.index(random_coor)
     xx, yy = all_positions_player.pop(i)
     return xx, yy
+
+
+def hard_turn(player_two, player_one, all_positions_computer):
+    """
+    Gives unfair advantage with three attempts to hit boat for computer on each turn
+    """
+    unfair_shots = 0
+    while unfair_shots < 3:
+        xx, yy = computer_select_coordinates(all_positions_computer)
+        hit = player_two.fire(xx, yy, player_one)
+        if hit == True:
+            hit = False
+            return hit
+        unfair_shots += 1
+    return hit
+
 
 
 def reporting(human_game, player_one, player_two):
@@ -141,28 +163,25 @@ def reporting(human_game, player_one, player_two):
         except:
             pass
     
-def preround(human_game, player_one, player_two, round_no):
+def preround_reporting(human_game, player_one, player_two, round_no):
     """
     
     """
     print("#"*20 + f" Round {round_no} " + "#"*20 + "\n")
     if human_game == "yes":
-        print(f"{player_one.id} Your board and your boats look like this:\n")
-        print(player_one.board)
-        print(f"\nLives remaining: {player_one.id} has {player_one.lives}, and {player_two.id} has {player_two.lives}")
+        print(f"{player_one.id}, your board and your boats look like this:\n")
+        print(f"{player_one.board}\n")
+        try:
+            hits = np.count_nonzero(player_one.shots_board == hit_boat_sym)
+            misses = np.count_nonzero(player_one.shots_board == hit_water_sym)
+            success_rate = hits / (hits + misses) * 100
+            print(f"- Total shots fired by {player_one.id}:\t\t{hits + misses} with a success rate of {success_rate:.2f}")
+            hits = np.count_nonzero(player_two.shots_board == hit_boat_sym)
+            misses = np.count_nonzero(player_two.shots_board == hit_water_sym)
+            success_rate = hits / (hits + misses) * 100
+            print(f"- Total shots fired by {player_two.id}:\t{hits + misses} with a success rate of {success_rate:.2f}")
+        except:
+            pass
+        print(f"- Lives remaining:\t\t\t{player_one.id} has {player_one.lives}, and {player_two.id} has {player_two.lives}")
         if human_game == "yes":
             input("\nHit 'Enter' to continue with your turn\n")
-            
-
-def hard_turn(player_two, player_one, all_positions_computer):
-    """
-    Gives unfair advantage with three attempts to hit boat for computer on each turn
-    """
-    unfair_shots = 3
-    while unfair_shots > 0:
-        xx, yy = computer_turn(all_positions_computer)
-        hit = player_two.fire(xx, yy, player_one)
-        if hit == True:
-            unfair_shots = 0
-        unfair_shots -= 1
-    return hit
