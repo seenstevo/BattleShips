@@ -1,13 +1,13 @@
 from time import sleep
-import random
 
 from functions import *
+from functions_print import *
 from class_Board import *
 from variables import *
 
 def main():
     
-    print("\n     ,     ,     ,\n    / \\   / \\   / \\\n   /___\\ /___\\ /___\\\n   |/ \\| |/ \\| |/ \\|\n   /   \\ /   \\ /   \\\n  /     \\/     \\/     \\\n /       /       /       \\\n/_________/_________/_________\\")
+    welcome_logo()
     
     player_name, human_game, all_positions_computer, all_positions_another_computer, level = welcome_and_setup()
     
@@ -20,9 +20,10 @@ def main():
     
     if human_game == "yes":
         final_instructions(lives, boats)
+        sleep(2)
         del all_positions_another_computer    
     
-#### Game is ready to commence! Initialise Round 1 ###################
+# Start Round 1
 
     round_no = 1
     exit_game = False

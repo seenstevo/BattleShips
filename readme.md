@@ -14,8 +14,10 @@ This game involves two players who each place a set number of boats on a board. 
 
 - main.py:            principal script for running the game which controls logic flow.
 - class_Boat.py:      definition of the attributes and methods for the Board class. each game involves two instances of this class, one for each player.
-- functions.py:       contains all other functions outside scope of the class Board.
+- functions.py:       contains helper functions outside scope of the class Board.
+- functions_print.py  contains all functions relating to prints including game set up
 - readme.md:          this readme
+- variables.py        constants used to configure game
 
 
 ## Overview of Key Objects in each file

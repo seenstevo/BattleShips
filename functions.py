@@ -6,34 +6,6 @@ from time import sleep
 from variables import *
 
 
-def random_positions_boat(size):
-    """
-    Generate a randomly positioned boat of given size and check it doesn't overflow board
-    
-    Args
-        size (int): takes in the boat size
-        
-    Return
-        boat_positions (list): list of tuple coordinates for the boat within the board
-    """
-    while True:
-        # set random starting coordinate
-        boat_start = (random.randint(0, 9), random.randint(0, 9))
-        # create the 4 directions
-        north, south, east, west = ((1, 0), (-1, 0), (0, 1), (0, -1))
-        # select one of the 4 directions to extend the boat
-        direction = random.choice([north, south, east, west])
-        
-        # generate the vectors in each orientation for boat positions
-        x_positions = np.array([boat_start[0]+(i*direction[0]) for i in range(size)])
-        y_positions = np.array([boat_start[1]+(i*direction[1]) for i in range(size)])
-        # check we haven't overflown board, if so restart loop
-        all_positions = np.concatenate((x_positions, y_positions))
-        if np.min(all_positions) < 0 or np.max(all_positions) > (board_dimensions[0] - 1):
-            continue
-        # add coordinates of 
-        return [(x, y) for x, y in zip(x_positions, y_positions)]
-   
 def welcome_and_setup():
     """
     Function to set up game type (human vs computer or computer vs computer) and take player name if required.
@@ -62,24 +34,34 @@ def welcome_and_setup():
     return player_name, human_game, all_positions_computer, all_positions_another_computer, level
 
 
-
-def final_instructions(lives, boats):
+def random_positions_boat(size):
     """
-    Simply print the starting board and final instructions for player.
+    Generate a randomly positioned boat of given size and check it doesn't overflow board
     
     Args
-        lives (int): how many lives each player has to start
-        boats (dict): all boats to be placed for each board
-        player (class Board instance): this gets the player instance from which we get the id and board with boats placed
+        size (int): takes in the boat size
+        
+    Return
+        boat_positions (list): list of tuple coordinates for the boat within the board
     """
-    print("\nInstructions:\n\n\t- To fire, enter coordinates (two values 1-10 separated by a ',', '.', '-' or a space. E.g. 2,6 or 2 6)")
-    print(f"\t- If you are successful, you can fire again.")
-    print(f"\t- You have a total of {lives} lives between your {len(boats)} boats.")
-    print("\t- To exit game, when asked to insert coordinates, enter 'EXIT'\n")
-    input("Press 'enter' when you are ready to begin.\n")
-    print("Let battle commence!!!!\n")
-    sleep(2)
-    
+    while True:
+        # set random starting coordinate
+        boat_start = (random.randint(0, 9), random.randint(0, 9))
+        # create the 4 directions
+        north, south, east, west = ((1, 0), (-1, 0), (0, 1), (0, -1))
+        # select one of the 4 directions to extend the boat
+        direction = random.choice([north, south, east, west])
+        
+        # generate the vectors in each orientation for boat positions
+        x_positions = np.array([boat_start[0]+(i*direction[0]) for i in range(size)])
+        y_positions = np.array([boat_start[1]+(i*direction[1]) for i in range(size)])
+        # check we haven't overflown board, if so restart loop
+        all_positions = np.concatenate((x_positions, y_positions))
+        if np.min(all_positions) < 0 or np.max(all_positions) > (board_dimensions[0] - 1):
+            continue
+        # add coordinates of 
+        return [(x, y) for x, y in zip(x_positions, y_positions)]
+   
     
 def human_turn(user_input):
     """
@@ -143,45 +125,3 @@ def hard_turn(player_two, player_one, all_positions_computer):
             return hit
         unfair_shots += 1
     return hit
-
-
-
-def reporting(human_game, player_one, player_two):
-    """
-    simple report of shots fired and success rate
-    """
-    if human_game == "yes":
-        try:
-            hits = np.count_nonzero(player_one.shots_board == hit_boat_sym)
-            misses = np.count_nonzero(player_one.shots_board == hit_water_sym)
-            success_rate = hits / (hits + misses) * 100
-            print(f"- Total fired shots by {player_one.id}: {hits + misses} with a success rate of {success_rate:.2f}")
-            hits = np.count_nonzero(player_two.shots_board == hit_boat_sym)
-            misses = np.count_nonzero(player_two.shots_board == hit_water_sym)
-            success_rate = hits / (hits + misses) * 100
-            print(f"- Total fired shots by {player_two.id}: {hits + misses} with a success rate of {success_rate:.2f}\n")
-        except:
-            pass
-    
-def preround_reporting(human_game, player_one, player_two, round_no):
-    """
-    
-    """
-    print("#"*20 + f" Round {round_no} " + "#"*20 + "\n")
-    if human_game == "yes":
-        print(f"{player_one.id}, your board and your boats look like this:\n")
-        print(f"{player_one.board}\n")
-        try:
-            hits = np.count_nonzero(player_one.shots_board == hit_boat_sym)
-            misses = np.count_nonzero(player_one.shots_board == hit_water_sym)
-            success_rate = hits / (hits + misses) * 100
-            print(f"- Total shots fired by {player_one.id}:\t\t{hits + misses} with a success rate of {success_rate:.2f}")
-            hits = np.count_nonzero(player_two.shots_board == hit_boat_sym)
-            misses = np.count_nonzero(player_two.shots_board == hit_water_sym)
-            success_rate = hits / (hits + misses) * 100
-            print(f"- Total shots fired by {player_two.id}:\t{hits + misses} with a success rate of {success_rate:.2f}")
-        except:
-            pass
-        print(f"- Lives remaining:\t\t\t{player_one.id} has {player_one.lives}, and {player_two.id} has {player_two.lives}")
-        if human_game == "yes":
-            input("\nHit 'Enter' to continue with your turn\n")
