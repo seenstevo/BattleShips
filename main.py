@@ -2,7 +2,7 @@ from time import sleep
 
 from functions import *
 from functions_print import *
-from class_Board import *
+from Board import *
 from variables import *
 
 def main():
@@ -19,15 +19,14 @@ def main():
     player_two.place_boats()
     
     if human_game == "yes":
-        final_instructions(lives, boats)
+        final_instructions()
         sleep(2)
         del all_positions_another_computer    
-    
-# Start Round 1
 
     round_no = 1
     exit_game = False
-
+    
+    # Start Round 1
     while True:
         
         preround_reporting(human_game, player_one, player_two, round_no)
@@ -37,18 +36,17 @@ def main():
             
             if human_game == "yes":
                 try:
-                    print(f"\nBefore you shoot, here is your shots history. (Your last shot was at {x+1}-{y+1}):\n")
+                    print(f"\nBefore you shoot, here are your previous shots. (Your last shot was at {x+1}-{y+1}):\n")
                 except:
                     print("\nBefore you shoot, here is your shots history:")
                 print(f"\n{player_one.shots_board}")
                 user_input = input("\nEnter coordinates:\n").lower()
                 try:
                     exit_game, x, y = human_turn(user_input)
+                    if exit_game == True:
+                        break
                 except:
                     continue
-                
-            if exit_game == True:
-                break
                           
             elif human_game == "no":
                 x, y = computer_select_coordinates(all_positions_another_computer)
@@ -70,6 +68,7 @@ def main():
             input("\nHit 'Enter' to continue with opponents turn")
          
         # player_two turn
+        unfair_shots = 0
         while True:
 
             if human_game == "yes":
@@ -77,7 +76,7 @@ def main():
                 sleep(2)
             
             if level == "hard":
-                hit = hard_turn(player_two, player_one, all_positions_computer)
+                hit, unfair_shots = hard_turn(player_two, player_one, all_positions_computer, unfair_shots)
             else:
                 xx, yy = computer_select_coordinates(all_positions_computer)
                 hit = player_two.fire(xx, yy, player_one)

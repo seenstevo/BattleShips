@@ -7,6 +7,7 @@ board_dimensions = (10, 10)
 
 lives = sum(boats.values())
 
+# logic to ensure we have enough space to place boats
 while board_dimensions[0] * board_dimensions[1] <= (lives + 5):
     board_dimensions = (board_dimensions[0] + 1, board_dimensions[1] + 1)
 
@@ -14,5 +15,3 @@ water_sym = " "
 boat_sym = "O"
 hit_water_sym = "*"
 hit_boat_sym = "X"
-
-#print(board_dimensions, lives)

@@ -45,21 +45,18 @@ def random_positions_boat(size):
         boat_positions (list): list of tuple coordinates for the boat within the board
     """
     while True:
-        # set random starting coordinate
-        boat_start = (random.randint(0, 9), random.randint(0, 9))
-        # create the 4 directions
+        x = board_dimensions[0] - 1
+        y = board_dimensions[1] - 1
+        boat_start = (random.randint(0, x), random.randint(0, y))
         north, south, east, west = ((1, 0), (-1, 0), (0, 1), (0, -1))
-        # select one of the 4 directions to extend the boat
         direction = random.choice([north, south, east, west])
         
-        # generate the vectors in each orientation for boat positions
         x_positions = np.array([boat_start[0]+(i*direction[0]) for i in range(size)])
-        y_positions = np.array([boat_start[1]+(i*direction[1]) for i in range(size)])
-        # check we haven't overflown board, if so restart loop
-        all_positions = np.concatenate((x_positions, y_positions))
-        if np.min(all_positions) < 0 or np.max(all_positions) > (board_dimensions[0] - 1):
+        if np.min(x_positions) < 0 or np.max(x_positions) > x:
             continue
-        # add coordinates of 
+        y_positions = np.array([boat_start[1]+(i*direction[1]) for i in range(size)])
+        if np.min(y_positions) < 0 or np.max(y_positions) > y:
+            continue
         return [(x, y) for x, y in zip(x_positions, y_positions)]
    
     
@@ -84,7 +81,7 @@ def human_turn(user_input):
         exit_game = True
         return exit_game, x, y
     try:
-        x, y = ((int(c) -1) for c in re.split('[ ,.-]', user_input))
+        x, y = ((int(c) - 1) for c in re.split('[ ,.-]', user_input))
         if check_coordinate_limits(x, y):
             return exit_game, x, y
     except ValueError:
@@ -95,7 +92,7 @@ def check_coordinate_limits(x, y):
     """
     Helper function to check input coordinates are on board
     """
-    if (x < 0) or (x > board_dimensions[0]) or (y < 0) or (y > board_dimensions[1]):
+    if (x < 0) or (x > board_dimensions[0] - 1) or (y < 0) or (y > board_dimensions[1] - 1):
         print(f"Please enter values between 1-{board_dimensions[0]} and 1-{board_dimensions[1]}")
         return False
     else:
@@ -112,16 +109,16 @@ def computer_select_coordinates(all_positions_player):
     return xx, yy
 
 
-def hard_turn(player_two, player_one, all_positions_computer):
+def hard_turn(player_two, player_one, all_positions_computer, unfair_shots):
     """
     Gives unfair advantage with three attempts to hit boat for computer on each turn
     """
-    unfair_shots = 0
     while unfair_shots < 3:
         xx, yy = computer_select_coordinates(all_positions_computer)
         hit = player_two.fire(xx, yy, player_one)
         if hit == True:
-            hit = False
-            return hit
-        unfair_shots += 1
-    return hit
+            unfair_shots += 1
+            return hit, unfair_shots
+        else:
+            unfair_shots += 1
+    return hit, unfair_shots

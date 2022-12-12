@@ -1,7 +1,9 @@
+import numpy as np
+
 from variables import *
 
 
-def final_instructions(lives, boats):
+def final_instructions():
     """
     Simply print the starting board and final instructions for player.
     
@@ -20,7 +22,7 @@ def final_instructions(lives, boats):
     
 def preround_reporting(human_game, player_one, player_two, round_no):
     """
-    
+    Print to screen the board, lives left and stats on success rates of each player
     """
     print("#"*20 + f" Round {round_no} " + "#"*20 + "\n")
     if human_game == "yes":
